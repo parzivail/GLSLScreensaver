@@ -10,6 +10,7 @@ namespace GLSLScreensaver
     {
         static void Main(string[] args)
         {
+            MainWindow.DoTheThingZhuLi();
         }
     }
 }
