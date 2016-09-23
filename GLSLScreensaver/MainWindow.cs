@@ -16,7 +16,10 @@ namespace GLSLScreensaver
     {
         private bool _shouldDie;
 
-        readonly ScreensaverShader _shader = new ScreensaverShader();
+        readonly ScreensaverShader _shader = new ScreensaverShader("sines");
+
+        readonly UniformDynamicTime _uniformDynamicTime = new UniformDynamicTime();
+        private readonly Uniform _uniformResolution = new Uniform("resolution") {Value = new Vector2(1920, 1080)};
 
         public MainWindow() : base(1920, 1080, new GraphicsMode(32, 24, 0, 8))
         {
@@ -24,13 +27,13 @@ namespace GLSLScreensaver
             Resize += ResizeHandler;
             UpdateFrame += UpdateHandler;
             RenderFrame += RenderHandler;
-
-
         }
 
         public void LoadHandler(object sender, EventArgs e)
         {
             _shader.InitProgram();
+
+            WindowState = WindowState.Fullscreen;
         }
 
         private void ResizeHandler(object sender, EventArgs e)
@@ -59,9 +62,14 @@ namespace GLSLScreensaver
             GL.Clear(ClearBufferMask.ColorBufferBit |
                      ClearBufferMask.DepthBufferBit |
                      ClearBufferMask.StencilBufferBit);
-
-            _shader.Use(DateTime.Now.Millisecond / 1000f);
             
+            var uniforms = new List<Uniform>
+            {
+                _uniformDynamicTime,
+                _uniformResolution
+            };
+            _shader.Use(uniforms.ToArray());
+
             GL.Begin(BeginMode.Quads);
             GL.Color3(Color.White);
             GL.TexCoord2(0.0f, 1.0f);

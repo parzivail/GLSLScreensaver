@@ -53,11 +53,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScreensaverShader.cs" />
     <Compile Include="Shader.cs" />
+    <Compile Include="Uniform.cs" />
+    <Compile Include="UniformDynamicTime.cs" />
+    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
-    <None Include="Shaders\main.fs">
+    <None Include="Shaders\falling.frag">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Shaders\sines.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

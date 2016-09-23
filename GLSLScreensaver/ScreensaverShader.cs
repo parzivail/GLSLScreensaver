@@ -3,24 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using OpenTK.Graphics.OpenGL;
+using OpenTK.Graphics.ES10;
+using OpenTK.Graphics.ES20;
+using GL = OpenTK.Graphics.OpenGL.GL;
+using ShaderType = OpenTK.Graphics.OpenGL.ShaderType;
 
 namespace GLSLScreensaver
 {
     class ScreensaverShader : Shader
     {
+        public string ShaderName { get; set; }
+
+        public ScreensaverShader(string name)
+        {
+            ShaderName = name;
+        }
+
         protected override void Init()
         {
-            LoadShader("Shaders\\main.fs", ShaderType.FragmentShader, PgmId, out FsId);
+            LoadShader($"Shaders\\{ShaderName}.frag", ShaderType.FragmentShader, PgmId, out FsId);
 
             GL.LinkProgram(PgmId);
             Console.WriteLine(GL.GetProgramInfoLog(PgmId));
-        }
-
-        protected override void SetupUniforms(params object[] uniforms)
-        {
-            var timeLoc = GL.GetUniformLocation(PgmId, "time");
-            GL.Uniform1(timeLoc, (float) uniforms[0]);
         }
     }
 }
