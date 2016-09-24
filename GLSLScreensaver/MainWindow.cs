@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
+using Newtonsoft.Json;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -15,18 +16,30 @@ namespace GLSLScreensaver
     internal class MainWindow : GameWindow
     {
         private bool _shouldDie;
+        public static readonly Vector2 Resolution = new Vector2(DisplayDevice.Default.Width, DisplayDevice.Default.Height);
 
-        readonly ScreensaverShader _shader = new ScreensaverShader("sines");
-
+        readonly ScreensaverShader _shader;
         readonly UniformDynamicTime _uniformDynamicTime = new UniformDynamicTime();
-        private readonly Uniform _uniformResolution = new Uniform("resolution") {Value = new Vector2(1920, 1080)};
+        private readonly Uniform _uniformResolution = new Uniform("resolution") {Value = Resolution};
+        private readonly Uniform _uniformMouse = new Uniform("mouse");
 
-        public MainWindow() : base(1920, 1080, new GraphicsMode(32, 24, 0, 8))
+        public static Config Config { get; set; }
+
+        public MainWindow() : base((int)Resolution.X, (int)Resolution.Y, new GraphicsMode(32, 24, 0, 8))
         {
             Load += LoadHandler;
             Resize += ResizeHandler;
             UpdateFrame += UpdateHandler;
             RenderFrame += RenderHandler;
+
+            Config = new Config
+            {
+                Shader = "space",
+                Speed = 1
+            };
+
+            _shader = new ScreensaverShader(Config.Shader);
+            _uniformMouse.Value = new Vector2(Config.MouseX, Config.MouseY);
         }
 
         public void LoadHandler(object sender, EventArgs e)
@@ -42,7 +55,7 @@ namespace GLSLScreensaver
 
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-            GL.Ortho(0, 1920, 1080, 0, 0, 1);
+            GL.Ortho(0, Resolution.X, Resolution.Y, 0, 0, 1);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
 
@@ -66,21 +79,24 @@ namespace GLSLScreensaver
             var uniforms = new List<Uniform>
             {
                 _uniformDynamicTime,
-                _uniformResolution
+                _uniformResolution,
+                _uniformMouse
             };
             _shader.Use(uniforms.ToArray());
 
+            GL.PushMatrix();
             GL.Begin(BeginMode.Quads);
             GL.Color3(Color.White);
             GL.TexCoord2(0.0f, 1.0f);
-            GL.Vertex2(0f, 1080f);
+            GL.Vertex2(0f, Resolution.Y);
             GL.TexCoord2(1.0f, 1.0f);
-            GL.Vertex2(1920f, 1080f);
+            GL.Vertex2(Resolution.X, Resolution.Y);
             GL.TexCoord2(1.0f, 0.0f);
-            GL.Vertex2(1920f, 0f);
+            GL.Vertex2(Resolution.X, 0f);
             GL.TexCoord2(0.0f, 0.0f);
             GL.Vertex2(0f, 0f);
             GL.End();
+            GL.PopMatrix();
 
             SwapBuffers();
         }
@@ -93,7 +109,25 @@ namespace GLSLScreensaver
         public static void DoTheThingZhuLi()
         {
             var mainWindow = new MainWindow();
-            mainWindow.Run(20);
+            mainWindow.Run(10, 30);
         }
+    }
+
+    internal class Config
+    {
+        [JsonProperty("shaderFileName")]
+        public string Shader { get; set; }
+
+        [JsonProperty("qualitySpeedTradeoff")]
+        public float Speed { get; set; } = 1;
+
+        [JsonProperty("timeScale")]
+        public float TimeScale { get; set; } = 1;
+
+        [JsonProperty("mouseX")]
+        public float MouseX { get; set; } = 0.5f;
+
+        [JsonProperty("mouseY")]
+        public float MouseY { get; set; } = 0.5f;
     }
 }

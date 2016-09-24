@@ -8,13 +8,15 @@ namespace GLSLScreensaver
 {
     class UniformDynamicTime : Uniform
     {
+        private static readonly DateTime _start = DateTime.Now;
+
         public UniformDynamicTime() : base("time")
         {
         }
 
         public override object GetValue()
         {
-            return DateTime.Now.ToUnixTime();
+            return (float)(DateTime.Now - _start).TotalSeconds * MainWindow.Config.TimeScale;
         }
     }
 }

@@ -50,7 +50,7 @@ float f(float x){
 // hauteur de la vague
 float wave(float x, int i){
     float i_f=float(i);
-    float fy = (3.3-0.5*i_f)*sin(x*2.+0.1*time+.6*i_f);
+    float fy = (3.3-0.5*i_f)*sin(x*2.+2.8*time+.6*i_f);
     return fy * (0.4+0.3*cos(x));
 }
 
@@ -62,7 +62,7 @@ void main(void)
 
 	
     float yf = 0.*d2y(distance(uv.y*2., f(uv.x)));
-    vec3 col = vec3(0.);
+    vec3 col = vec3(0.0);
     for(int i = 0; i<N; ++i){
         float i_f = float(i)*0.5+1.;
         float y = d2y2(distance(2.*uv.y, wave(uv.x, i)),i_f);
