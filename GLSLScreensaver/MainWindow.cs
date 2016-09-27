@@ -20,7 +20,7 @@ namespace GLSLScreensaver
 
         readonly ScreensaverShader _shader;
         readonly UniformDynamicTime _uniformDynamicTime = new UniformDynamicTime();
-        private readonly Uniform _uniformResolution = new Uniform("resolution") {Value = Resolution};
+        private readonly Uniform _uniformResolution;
         private readonly Uniform _uniformMouse = new Uniform("mouse");
 
         public static Config Config { get; set; }
@@ -34,12 +34,14 @@ namespace GLSLScreensaver
 
             Config = new Config
             {
-                Shader = "space",
-                Speed = 1
+                Shader = "startrip",
+                Speed = 4
             };
 
             _shader = new ScreensaverShader(Config.Shader);
             _uniformMouse.Value = new Vector2(Config.MouseX, Config.MouseY);
+            _uniformResolution = new Uniform("resolution") {Value = Resolution/Config.Speed};
+            ClientRectangle = new Rectangle(ClientRectangle.X, ClientRectangle.Y, (int)(ClientRectangle.Width / Config.Speed), (int)(ClientRectangle.Height / Config.Speed));
         }
 
         public void LoadHandler(object sender, EventArgs e)
@@ -55,7 +57,7 @@ namespace GLSLScreensaver
 
             GL.MatrixMode(MatrixMode.Projection);
             GL.LoadIdentity();
-            GL.Ortho(0, Resolution.X, Resolution.Y, 0, 0, 1);
+            GL.Ortho(0, 1, 0, 1, -0.1f, 0.1f);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadIdentity();
 
@@ -85,14 +87,16 @@ namespace GLSLScreensaver
             _shader.Use(uniforms.ToArray());
 
             GL.PushMatrix();
+            GL.Translate(Config.Speed / 2, Config.Speed / 2, 0);
+            //GL.Scale(Config.Speed, Config.Speed, 1);
             GL.Begin(BeginMode.Quads);
             GL.Color3(Color.White);
             GL.TexCoord2(0.0f, 1.0f);
-            GL.Vertex2(0f, Resolution.Y);
+            GL.Vertex2(0f, 1 / Config.Speed);
             GL.TexCoord2(1.0f, 1.0f);
-            GL.Vertex2(Resolution.X, Resolution.Y);
+            GL.Vertex2(1 / Config.Speed, 1 / Config.Speed);
             GL.TexCoord2(1.0f, 0.0f);
-            GL.Vertex2(Resolution.X, 0f);
+            GL.Vertex2(1 / Config.Speed, 0f);
             GL.TexCoord2(0.0f, 0.0f);
             GL.Vertex2(0f, 0f);
             GL.End();
