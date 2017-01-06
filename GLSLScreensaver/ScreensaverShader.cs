@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +17,13 @@ namespace GLSLScreensaver
 
         public ScreensaverShader(string name)
         {
-            ShaderName = name;
+            if (name == ":random")
+            {
+                var files = Directory.GetFiles("Shaders");
+                ShaderName = Path.GetFileNameWithoutExtension(files[new Random().Next(files.Length)]);
+            }
+            else
+                ShaderName = name;
         }
 
         protected override void Init()

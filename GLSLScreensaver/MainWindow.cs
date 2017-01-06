@@ -34,8 +34,7 @@ namespace GLSLScreensaver
 
             Config = new Config
             {
-                Shader = "startrip",
-                Speed = 4
+                Shader = ":random"
             };
 
             _shader = new ScreensaverShader(Config.Shader);
@@ -87,8 +86,6 @@ namespace GLSLScreensaver
             _shader.Use(uniforms.ToArray());
 
             GL.PushMatrix();
-            GL.Translate(Config.Speed / 2, Config.Speed / 2, 0);
-            //GL.Scale(Config.Speed, Config.Speed, 1);
             GL.Begin(BeginMode.Quads);
             GL.Color3(Color.White);
             GL.TexCoord2(0.0f, 1.0f);
